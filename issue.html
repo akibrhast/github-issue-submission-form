@@ -20,7 +20,7 @@
         event.preventDefault();
         let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
         let data = Object.fromEntries( new FormData(event.target) );
-        let rv  = createIssue({'title':'manual_title'},access_token);
+        let rv  = createIssue({title:'manual_title'},access_token);
         rv.then(e=>{console.log(e)})
 
     })
