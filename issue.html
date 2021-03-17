@@ -5,11 +5,11 @@
 <form>
     <div class="form-group">
       <label for="issueTitle">Issue Title</label>
-      <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title">
+      <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title" required>
     </div>
     <div class="form-group">
       <label for="issueBody">Issue Body</label>
-      <input type="text" name="body" class="form-control" id="issueBody" placeholder="Body Content">
+      <input type="text" name="body" class="form-control" id="issueBody" placeholder="Body Content" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
@@ -20,8 +20,13 @@
         event.preventDefault();
         let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
         let data = Object.fromEntries( new FormData(event.target) );
+        event.target.reset();
         let rv  = createIssue(data,access_token);
-        rv.then(e=>{console.log(e)})
+        rv.then(e=>{
+
+            console.log(e);
+            alert('ISSUE HAS BEEN SUCCESULLY POSTED ON!')
+        })
 
     })
 
