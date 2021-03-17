@@ -5,46 +5,29 @@
 <form>
     <div class="form-group">
       <label for="issueTitle">Issue Title</label>
-      <input type="text" name='issueTitle' class="form-control" id="issueTitle" placeholder="Enter Issue Title">
+      <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title">
     </div>
     <div class="form-group">
       <label for="issueBody">Issue Body</label>
-      <input type="text" name="issueBody" class="form-control" id="issueBody" placeholder="Body Content">
+      <input type="text" name="bpdy" class="form-control" id="issueBody" placeholder="Body Content">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 
 <script>
-    console.log(JSON.parse(localStorage.getItem('github-cred')))
+    const github_issue_create_endpoint = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
     document.addEventListener('submit',function(event){
         event.preventDefault();
-        let data = new FormData(event.target);
-        for(const p of data){
-            console.log(p);
-        }
+        let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
+        let data = Object.fromEntries( new FormData(event.target) );
+        let rv  = createIssue(data);
+        console.log(rv)
+
     })
 
-    // Example POST method implementation:
-    async function postData(url = '', data = {}) {
-        // Default options are marked with *
-        const response = await fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
-        return response.json(); // parses JSON response into native JavaScript objects
-    }
 
-    postData('https://example.com/answer', { answer: 42 })
-        .then(data => {
-            console.log(data); // JSON data parsed by `data.json()` call
-        });
+    async function createIssue(data){
+        let res = await axios.post(CREATE_ISSUE, {data}, { headers: {'Accept': 'application/vnd.github.v3+json' }  } )
+        return res.data;
+    }
 </script>
