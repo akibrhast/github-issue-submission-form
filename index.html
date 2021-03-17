@@ -7,3 +7,18 @@
 <div id='login-with-github-button'>
     <a href='https://github.com/login/oauth/authorize?client_id=0f4d20ae24b10b1b1e45&scope=repo' class="btn btn-primary">Login With GitHub</a>
 </div>
+<script>
+    let gc = localStorage.getItem('github-cred');
+    if(gc.length>0){
+        window.location.replace("https://akibrhast.github.io/github-issue-submission-form/issue.html");
+    }
+    else{
+        let link = `https://github.com/login/oauth/authorize?client_id=0f4d20ae24b10b1b1e45&scope=repo`
+        document.querySelector('login-with-github-button').insertAdjacentElement('afterbegin',
+         
+            `
+                <a href=${link} class='btn btn-primary btn-outline-dark'>Login With GitHub</a>
+            `
+        )
+    }
+</script>

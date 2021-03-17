@@ -6,17 +6,13 @@
 
 
 <script>
-    const clientId = '0f4d20ae24b10b1b1e45';
-    const clientSecret = '698886ef07bc854459044d012b5be122472795f6';
-    const redirect = 'https://akibrhast.github.io/github-issue-submission-form/callback';
-    const githubpost = 'https://secure-brook-93015.herokuapp.com/https://github.com/login/oauth/access_token';
-
+    const githubpost = `${BASE_CORS_URI}https://github.com/login/oauth/access_token`;
     (async function(){
         const urlParams = Object.fromEntries(new URLSearchParams(window.location.search));
         let res = await axios.post(githubpost, {
-                            client_id: clientId,
-                            client_secret: clientSecret,
-                            redirect_uri:redirect,
+                            client_id: CLIENT_ID,
+                            client_secret: CLIENT_SECRET,
+                            redirect_uri:REDIRECT_URI,
                             code: urlParams.code
                     },
                     {    
