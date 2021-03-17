@@ -3,9 +3,9 @@ safe: true
 
 source: .
 
-title: Hack for LA
-email: hello@hackforla.org
-description: Can you design, write, or code? Are you an activist with an idea? You can help Los Angeles live up to its potential at Hack for LA. Everyone is welcome!
+title: Github Issue Creator
+email: akib.rhast@gmail.com
+description: A repo to demonstrate creating github issues via a github pages site using form submission.
 
 baseurl: ""
 url:  "https://akibrhast.github.io/github-issue-submission-form/"
