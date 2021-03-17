@@ -4,6 +4,7 @@
 
 </div>
 
+
 <script>
     const clientId = '0f4d20ae24b10b1b1e45';
     const clientSecret = '698886ef07bc854459044d012b5be122472795f6';
@@ -19,8 +20,27 @@
                             code: urlParams.code
                     })
         localStorage.setItem('github-cred',res.data)
-        document.querySelector('#callback-return-display').innerHTML=`<p><strong>Callback return data is</strong>: <span>${localStorage.getItem('github-cred')}<span></p>`;
-        
-        return res.data;
+        if(localStorage.getItem('github-cred').length > 0){
+            document.querySelector('#callback-return-display').innerHTML=`
+                <p><strong>Callback return data has been successfully stored in local storage</strong></p>
+                <p>You will now be redirected to the issue submission page in -- <span id='timer'></span> seconds</p>
+            `;
+            window.location.replace("http://www.w3schools.com");
+        }
     })()
+
+    function redirectTimer(){
+        let counter = 5;
+        let interval = setInterval(function() {
+            counter--;
+            document.querySelector('#timer').append(counter)
+            // Display 'counter' wherever you want to display it.
+            if (counter == 0) {
+                clearInterval(interval);
+                window.location.replace("{{'/issue.html' | absoulute_url}}");
+            }
+        }, 1000);
+
+    }
+
 </script>
