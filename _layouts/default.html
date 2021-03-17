@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+{% include head.html %}
+<body>  
+  <div id="app">
+    {%- include navbar.html -%}
+    <main role="main" id='content' class="container-fluid">
+      {{ content }}
+    </main>
+    {%- include footer.html -%}
+  </div>
+</body>
+</html>
