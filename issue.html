@@ -29,7 +29,8 @@
     async function createIssue(data,at){
         let res = await axios.post(CREATE_ISSUE, {data}, { headers: {
             'Accept': 'application/vnd.github.v3+json',
-            'Authorization': `token ${at}`
+            'Authorization': `token ${at}`,
+            'Content-Type': "application/json"
         }  } )
         return res.data;
     }
