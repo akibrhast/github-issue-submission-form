@@ -19,7 +19,7 @@
                             code: urlParams.code
                     })
         localStorage.setItem('github-cred',res.data)
-        document.querySelector('#callback-return-display').append(`<p><strong>Callback return data is</strong>: <span>${localStorage.getItem('github-cred')}<span></p>`);
+        document.querySelector('#callback-return-display').innerHTML=`<p><strong>Callback return data is</strong>: <span>${localStorage.getItem('github-cred')}<span></p>`;
         
         return res.data;
     })()
