@@ -18,7 +18,11 @@
                             client_secret: clientSecret,
                             redirect_uri:redirect,
                             code: urlParams.code
-                    })
+                    },
+                    {    
+                        headers: {'Accept': 'application/json' }
+                    }
+                )
         localStorage.setItem('github-cred',res.data)
         if(localStorage.getItem('github-cred').length > 0){
             document.querySelector('#callback-return-display').innerHTML=`
