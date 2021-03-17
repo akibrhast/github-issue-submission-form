@@ -1,6 +1,6 @@
 ---
 ---
-<h1>Submit Github Issue Using This Form</h1>
+<h1>Issue: Project Profile Card Review and Update</h1>
 
 <form>
     <div class="form-group">
@@ -8,14 +8,20 @@
       <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title" required>
     </div>
     <div class="form-group">
-      <label for="issueBody">Issue Body</label>
-      <input type="text" name="body" class="form-control" id="issueBody" placeholder="Body Content" required>
+      <label for="projectName">Project Name</label>
+      <input type="text" name="projectname" class="form-control" id="projectName" placeholder="Project Name" required>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-group">
+        <label for="projectCardUrl">Project Card URL</label>
+        <input type="text" name="projectcardurl" class="form-control" id="projectCardUrl" placeholder="Example: https://github.com/hackforla/website/blob/gh-pages/_projects/ballot-nav.md" required>
+        <small id="projectcardhelp" class="form-text text-muted">Your Project can be found in this <a href="https://github.com/hackforla/website/tree/gh-pages/_projects">folder</a></small>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary" disabled>Submit</button>
   </form>
 
 <script>
-    const github_issue_create_endpoint = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
     document.addEventListener('submit',function(event){
         event.preventDefault();
         let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
