@@ -1,10 +1,23 @@
 ---
 ---
 <h1>Submit Github Issue Using This Form</h1>
-<form>
 
-</form>
+<form>
+    <div class="form-group">
+      <label for="issueTitle">Issue Title</label>
+      <input type="text" class="form-control" id="issueTitle" placeholder="Enter Issue Title">
+    </div>
+    <div class="form-group">
+      <label for="issueBody">Issue Body</label>
+      <input type="text" class="form-control" id="issueBody" placeholder="Body Content">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 
 <script>
-
+    document.addEventListener('submit',function(e){
+        e.preventDefault();
+        data = new FormData(document.querySelector('form'));
+        console.log(data)
+    })
 </script>
