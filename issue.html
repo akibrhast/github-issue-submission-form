@@ -13,10 +13,9 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-<script type="module">
-    import { Octokit } from "https://cdn.skypack.dev/@octokit/core";
-</script>
+
 <script>
+    console.log(JSON.parse(localStorage.getItem('github-cred')))
     document.addEventListener('submit',function(event){
         event.preventDefault();
         let data = new FormData(event.target);
