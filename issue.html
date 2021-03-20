@@ -6,8 +6,7 @@
 <div id="res" class="alert"></div>
 
 <script type="text/javascript">
-    let activeSchema = {
-        schema: {
+    let schema = {
             "identification": { "type": "string" },
             "title": { "type": "string" },
             "description": { "type": "string" },
@@ -79,12 +78,10 @@
                 "type": "string",
                 "enum": ["Active"]
             }
-
-        }
     }
 
     $('form').jsonForm({
-        activeSchema,
+        schema,
         onSubmit: function (errors, values) {
             if (errors) {
                 $('#res').html('<p>I beg your pardon?</p>');
