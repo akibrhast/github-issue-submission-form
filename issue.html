@@ -8,60 +8,94 @@
 <script type="text/javascript">
     let activeSchema = {
         schema: {
-                "identification":{"type":"string"},
-                "title": {"type": "string"},
-                "description": {"type": "string"},
-                "image": {"type":"string"},
-                "image-hero": {"type":"string"},
-                "alt": {"type": "string"},
-                "leadership": {
-                    "type":"array",
-                    "items":{"$ref": "#/$defs/leader"}
-                },
-                "links":{
-                    "type":"array",
-                    "items":{"$ref": "#/$defs/links"}
-                },
-                "location":{
-                    "type":"array",
-                    "items":{
-                    "type":"string",
-                    "enum":["Remote","Downtown LA","Santa Monica","South LA","Los Angeles"]
-                    }
-                },
-                "looking":{
-                    "type":["array","null"],
-                    "items":{"$ref": "#/$defs/looking"}
-                },
-                "technologies":{
-                    "type":"array",
-                    "items":{
-                    "type":"string"
-                    }
-                },
-                "partner":{"type":"string"},
-                "tools":{"type":"string"},
-                "vertical": {"type":"string"},
-                "status":{
-                    "type":"string",
-                    "enum":["Active"]
+            "identification": { "type": "string" },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "image": { "type": "string" },
+            "image-hero": { "type": "string" },
+            "alt": { "type": "string" },
+            "leadership": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ["name", "role", "picture", "links"],
+                    "properties": {
+                        "name": { "type": "string" },
+                        "role": { "type": "string" },
+                        "picture": { "type": "string" },
+                        "links": {
+                            "type": "object",
+                            "required": ["github", "slack"],
+                            "properties": {
+                                "github": { "type": "string" },
+                                "slack": { "type": "string" }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
                 }
-                    
+            },
+            "links": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ["name", "url"],
+                    "properties": {
+                        "name": { "type": "string" },
+                        "url": { "type": "string" }
+                    }
+                }
+            },
+            "location": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["Remote", "Downtown LA", "Santa Monica", "South LA", "Los Angeles"]
+                }
+            },
+            "looking": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "required": ["category", "skill"],
+                    "properties": {
+                        "category": { "type": "string" },
+                        "skill": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "technologies": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "partner": { "type": "string" },
+            "tools": { "type": "string" },
+            "vertical": { "type": "string" },
+            "status": {
+                "type": "string",
+                "enum": ["Active"]
             }
+
+        }
     }
-  $('form').jsonForm({
-    activeSchema ,
-    onSubmit: function (errors, values) {
-      if (errors) {
-        $('#res').html('<p>I beg your pardon?</p>');
-      }
-      else {
-        $('#res').html('<p>Hello ' + values.name + '.' +
-          (values.age ? '<br/>You are ' + values.age + '.' : '') +
-          '</p>');
-      }
-    }
-  });
+
+    $('form').jsonForm({
+        activeSchema,
+        onSubmit: function (errors, values) {
+            if (errors) {
+                $('#res').html('<p>I beg your pardon?</p>');
+            }
+            else {
+                $('#res').html('<p>Hello ' + values.name + '.' +
+                    (values.age ? '<br/>You are ' + values.age + '.' : '') +
+                    '</p>');
+            }
+        }
+    });
 </script>
 <!-- <form>
     <div class="form-group">
