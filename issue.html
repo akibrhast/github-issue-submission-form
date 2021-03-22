@@ -15,9 +15,9 @@
 
 <script type="text/javascript">
     let schema = {
-        "identification": { "type": "string" },
-        "title": { "type": "string" },
-        "description": { "type": "string" },
+        "identification": { "type": "string" ,"required": "true"},
+        "title": { "type": "string","required": "true" },
+        "description": { "type": "string","required": "true" },
         "image": { "type": "string" },
         "image-hero": { "type": "string" },
         "alt": { "type": "string" },
@@ -84,7 +84,8 @@
         "vertical": { "type": "string" },
         "status": {
             "type": "string",
-            "enum": ["Active"]
+            "enum": ["Active"],
+            "required": "true"
         }
     }
 
@@ -96,8 +97,7 @@
             $('#res').html('<p>I beg your pardon?</p>');
           }
           else {
-            $('#res').html(values
-            )
+            console.log(values)
           }
         }
     });
