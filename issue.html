@@ -91,17 +91,15 @@
 
     $('form').jsonForm({
         schema,
-        "form": [
-            "*",
-            {
-                "type": "button",
-                "title": "Submit Changes",
-                "onClick": function (evt) {
-                    evt.preventDefault();
-                    console.log(evt.target)
-                }
-            }
-        ]
+        onSubmit: function (errors, values) {
+          if (errors) {
+            $('#res').html('<p>I beg your pardon?</p>');
+          }
+          else {
+            $('#res').html(values
+            )
+          }
+        }
     });
 </script>
 <!-- <form>
