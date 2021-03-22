@@ -1,24 +1,33 @@
 ---
 ---
 
-<div>
-    After Logging in with github on by clicking the button the user is automaticallt redirected to callback.html route
+<div class="row align-items-center" style="height:50rem">
+    <div class="col-4"></div>
+    <div class="col-4">
+        <div>
+            After Logging in with github on by clicking the button the user is automatically redirected to callback.html route.
+        </div></br>
+        <div id='login-with-github-button'>
+        </div>
+    </div>
+    <div class="col-4"></div>
 </div>
-<div id='login-with-github-button'>
-    <a href='https://github.com/login/oauth/authorize?client_id=0f4d20ae24b10b1b1e45&scope=repo' class="btn btn-primary">Login With GitHub</a>
-</div>
+
 <script>
-    let gc = localStorage.getItem('github-cred');
-    if(gc.length>0){
-        window.location.replace("https://akibrhast.github.io/github-issue-submission-form/issue.html");
-    }
-    else{
-        let link = `https://github.com/login/oauth/authorize?client_id=0f4d20ae24b10b1b1e45&scope=repo`
-        document.querySelector('login-with-github-button').insertAdjacentElement('afterbegin',
-         
-            `
-                <a href=${link} class='btn btn-primary btn-outline-dark'>Login With GitHub</a>
-            `
-        )
-    }
+    document.addEventListener('DOMContentLoaded',(event)=>{
+        //let gc = localStorage.getItem('github-cred');
+        if(localStorage.getItem('github-cred')){
+            window.location.replace(ISSUE_SUBMISSION_LOCAL);
+        }
+        else{
+            let link = `${AUTHORIZE_URI}&scope=repo%20admin:org`
+            document.querySelector('#login-with-github-button').insertAdjacentHTML('afterbegin',
+                `
+                    <a href=${link} class='btn btn-dark'>Login With GitHub</a>
+                `
+            )
+        }
+
+    })
+
 </script>

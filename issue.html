@@ -1,148 +1,269 @@
 ---
 ---
+
 <h1>Issue: Project Profile Card Review and Update</h1>
 <div class="row">
     <div class="col-4">
-
+        <label for="projects">Choose a Project To Update:</label>
+        <select name="projects" id="projects"></select>
     </div>
-    <div class="col-4">
-        <form></form>
+    <div class="col-6">
+        <style type="text/css">
+            label {
+                text-transform: capitalize;
+                font-weight: bold;
+            }
+        </style>
+        <div class="form-container">
+
+        </div>
         <div id="res" class="alert"></div>
     </div>
-    <div class="col-4"></div>
+    <div class="col-2"></div>
 </div>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.0.0/js-yaml.min.js"
+    integrity="sha512-dYHhQSvQ3Lepc2xDidh80aADfrIAaVTs52W5JSFlE47SJgcwD+YY+iY0XmXD9UX3k0YOPvoyugS/ieGjpu5M/Q=="
+    crossorigin="anonymous"></script>
 <script type="text/javascript">
-    let schema = {
-        "identification": { "type": "string" ,"required": "true"},
-        "title": { "type": "string","required": "true" },
-        "description": { "type": "string","required": "true" },
-        "image": { "type": "string" },
-        "image-hero": { "type": "string" },
-        "alt": { "type": "string" },
-        "leadership": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["name", "role", "picture", "links"],
-                "properties": {
-                    "name": { "type": "string" },
-                    "role": { "type": "string" },
-                    "picture": { "type": "string" },
-                    "links": {
-                        "type": "object",
-                        "required": ["github", "slack"],
-                        "properties": {
-                            "github": { "type": "string" },
-                            "slack": { "type": "string" }
-                        },
-                        "additionalProperties": false
-                    }
-                },
-                "additionalProperties": false
-            }
-        },
-        "links": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["name", "url"],
-                "properties": {
-                    "name": { "type": "string" },
-                    "url": { "type": "string" }
-                }
-            }
-        },
-        "location": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": ["Remote", "Downtown LA", "Santa Monica", "South LA", "Los Angeles"]
-            }
-        },
-        "looking": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "object",
-                "required": ["category", "skill"],
-                "properties": {
-                    "category": { "type": "string" },
-                    "skill": { "type": "string" }
-                },
-                "additionalProperties": false
-            }
-        },
-        "technologies": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "partner": { "type": "string" },
-        "tools": { "type": "string" },
-        "vertical": { "type": "string" },
-        "status": {
-            "type": "string",
-            "enum": ["Active"],
-            "required": "true"
-        }
-    }
+    document.addEventListener("DOMContentLoaded", (event) => {
 
 
-    $('form').jsonForm({
-        schema,
-        onSubmit: function (errors, values) {
-          if (errors) {
-            $('#res').html('<p>I beg your pardon?</p>');
-          }
-          else {
-            console.log(values)
-          }
-        }
+
+        let listOfProjects = getListOfProjects();
+        listOfProjects.then((arr_object) => {
+            arr_object.forEach((item) => {
+                document
+                    .querySelector("#projects")
+                    .insertAdjacentHTML("beforeend", listCreator(item.path, item.name));
+            });
+        });
+
+        document
+            .querySelector("select")
+            .addEventListener("change", function (event) {
+                let projectDataFromFile = getProjectDataFromFile(event.target.value);
+                projectDataFromFile.then((rawDataYmlString) => {
+                    var value = jsyaml.load(rawDataYmlString);
+                    createFormPreFilled(value);
+
+                });
+            });
     });
-</script>
-<!-- <form>
-    <div class="form-group">
-      <label for="issueTitle">Issue Title</label>
-      <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title" required>
-    </div>
-    <div class="form-group">
-      <label for="projectName">Project Name</label>
-      <input type="text" name="projectname" class="form-control" id="projectName" placeholder="Project Name" required>
-    </div>
-    <div class="form-group">
-        <label for="projectCardUrl">Project Card URL</label>
-        <input type="text" name="projectcardurl" class="form-control" id="projectCardUrl" placeholder="https://github.com/hackforla/website/blob/gh-pages/_projects/<PROJECT-NAME.md>" required>
-        <small id="projectcardhelp" class="form-text text-muted">Your Project can be found in this <a href="https://github.com/hackforla/website/tree/gh-pages/_projects">folder</a></small>
-    </div>
 
+    function createFormPreFilled(value) {
 
-    <button type="submit" class="btn btn-primary" disabled>Submit</button>
-  </form> -->
+        document.querySelector(`.form-container`).innerHTML = `<form></form>`;
 
-<!-- <script>
-    document.addEventListener('submit',function(event){
-        event.preventDefault();
-        let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
-        let data = Object.fromEntries( new FormData(event.target) );
-        event.target.reset();
-        let rv  = createIssue(data,access_token);
-        rv.then(e=>{
+        const schema = {
+            identification: { type: "string", required: "true" },
+            title: { type: "string", required: "true" },
+            description: { type: "string", required: "true" },
+            image: { type: "string" },
+            "image-hero": { type: "string" },
+            alt: { type: "string" },
+            leadership: {
+                type: "array",
+                items: {
+                    type: "object",
+                    required: ["name", "role", "picture", "links"],
+                    properties: {
+                        name: { type: "string" },
+                        role: { type: "string" },
+                        picture: { type: "string" },
+                        links: {
+                            type: "object",
+                            required: ["github", "slack"],
+                            properties: {
+                                github: { type: "string" },
+                                slack: { type: "string" },
+                            },
+                            additionalProperties: false,
+                        },
+                    },
+                    additionalProperties: false,
+                },
+            },
+            links: {
+                type: "array",
+                items: {
+                    type: "object",
+                    required: ["name", "url"],
+                    properties: {
+                        name: { type: "string" },
+                        url: { type: "string" },
+                    },
+                },
+            },
+            location: {
+                type: "array",
+                items: {
+                    type: "string",
+                    enum: [
+                        "Remote",
+                        "Downtown LA",
+                        "Santa Monica",
+                        "South LA",
+                        "Los Angeles",
+                    ],
+                },
+            },
+            looking: {
+                type: ["array", "null"],
+                items: {
+                    type: "object",
+                    required: ["category", "skill"],
+                    properties: {
+                        category: { type: "string" },
+                        skill: { type: "string" },
+                    },
+                    additionalProperties: false,
+                },
+            },
+            technologies: {
+                type: "array",
+                items: {
+                    type: "string",
+                },
+            },
+            partner: { type: "string" },
+            tools: { type: "string" },
+            vertical: { type: "string" },
+            status: {
+                type: "string",
+                enum: ["Active"],
+                required: "true",
+            },
+        };
 
-            console.log(e);
-            alert('ISSUE HAS BEEN SUCCESULLY POSTED ON!')
-        })
+        $("form").jsonForm({
+            schema,
+            value,
+            onSubmit: function (errors, values) {
+                if (errors) {
+                    $("#res").html("<p>I beg your pardon?</p>");
+                } else {
+                    let submit = setNewIssue( jsyaml.dump(values) )
+                    submit.then(data=>{
+                        console.log(data);
+                    })
+                }
+            },
+        });
 
-    })
+        applyStylesToForm();
 
-
-    async function createIssue(data,at){
-        let res = await axios.post(CREATE_ISSUE, data, { headers: {
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': `token ${at}`,
-            'Content-Type': "application/json"
-        }  } )
-        return res.data;
     }
-</script> -->
+
+    function applyStylesToForm() {
+
+        document.querySelector("form") &&
+            document
+                .querySelector("form")
+                .setAttribute("class", "px-5 py-5 border border-dark rounded");
+
+    }
+    function listCreator(path, name) {
+        return `
+            <option value=${path}>${name}</option>
+		   `;
+    }
+
+    async function getProjectDataFromFile(path) {
+        let data = `{
+                        repository(owner: "hackforla", name: "website") {
+                            commit: object(expression: "HEAD:") {
+                                ... on Commit {
+                                        oid
+                                    }
+                                }
+                            content: object(expression: "gh-pages:${path}") {
+                                ... on Blob {
+                                        text
+                                    }
+                            }
+                        }
+                }
+                `;
+
+        let res = await axios({
+            url: GRAPH_QL_BASE_ENDPOINT,
+            headers: {
+                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
+                "Content-Type": `application/json`,
+            },
+            method: "post",
+            data: {
+                query: data,
+            },
+        });
+        return res.data.data.repository.content.text.replaceAll("---", "");
+    }
+
+    async function getListOfProjects() {
+        let data = `{
+                repository(owner: "hackforla", name: "website") {
+                    commit: object(expression: "HEAD:") {
+                    ... on Commit {
+                        oid
+                    }
+                    }
+                    filename: object(expression: "gh-pages:_projects/") {
+                    ... on Tree {
+                        entries {
+                        name
+                        path
+                        }
+                    }
+                    }
+                }}
+                `;
+
+        let res = await axios({
+            url: GRAPH_QL_BASE_ENDPOINT,
+            headers: {
+                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
+                "Content-Type": `application/json`,
+            },
+            method: "post",
+            data: {
+                query: data,
+            },
+        });
+        return res.data.data.repository.filename.entries;
+    }
+
+    async function setNewIssue(issueBody) {
+
+        data = `
+                mutation MyMutation {
+                    __typename
+                    createIssue(input: {repositoryId: "MDEwOlJlcG9zaXRvcnkxMzAwMDA1NTE=", title: "Project Profile Card Review and Update", body: "${issueBody}" }) {
+                        clientMutationId
+                        issue {
+                        url
+                        author {
+                            ... on User {
+                            id
+                            name
+                            }
+                        }
+                        }
+                    }
+                    }`;
+        let res = await axios({
+            url: GRAPH_QL_BASE_ENDPOINT,
+            headers: {
+                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
+                "Content-Type": `application/json`,
+            },
+            method: "post",
+            data: {
+                query: data,
+            },
+        });
+        return res.data.data.createIssue.issue;
+
+
+    }
+</script>

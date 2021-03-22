@@ -1,18 +1,24 @@
 ---
 ---
-<div id="callback-return-display">
 
+
+<div class="row align-items-center" style="height:50rem">
+    <div class="col-4"></div>
+    <div class="col-4">
+        <div id="callback-return-display" class="rounded border-dark">
+
+        </div>
+    </div>
+    <div class="col-4"></div>
 </div>
 
-
 <script>
-    const githubpost = `${BASE_CORS_URI}https://github.com/login/oauth/access_token`;
     (async function(){
         const urlParams = Object.fromEntries(new URLSearchParams(window.location.search));
-        let res = await axios.post(githubpost, {
+        let res = await axios.post(ACCESS_TOKEN_URI, {
                             client_id: CLIENT_ID,
                             client_secret: CLIENT_SECRET,
-                            redirect_uri:REDIRECT_URI,
+                            redirect_uri:REDIRECT_URI_LOCAL,
                             code: urlParams.code
                     },
                     {    
@@ -33,11 +39,11 @@
         let counter = 5;
         let interval = setInterval(function() {
             counter--;
-            document.querySelector('#timer').append(counter)
+            document.querySelector('#timer').innerHTML = counter
             // Display 'counter' wherever you want to display it.
             if (counter == 0) {
                 clearInterval(interval);
-                window.location.replace("https://akibrhast.github.io/github-issue-submission-form/issue.html");
+                window.location.replace(ISSUE_SUBMISSION_LOCAL);
             }
         }, 1000);
 

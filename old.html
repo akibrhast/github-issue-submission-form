@@ -1,0 +1,44 @@
+<!-- <form>
+    <div class="form-group">
+      <label for="issueTitle">Issue Title</label>
+      <input type="text" name='title' class="form-control" id="issueTitle" placeholder="Enter Issue Title" required>
+    </div>
+    <div class="form-group">
+      <label for="projectName">Project Name</label>
+      <input type="text" name="projectname" class="form-control" id="projectName" placeholder="Project Name" required>
+    </div>
+    <div class="form-group">
+        <label for="projectCardUrl">Project Card URL</label>
+        <input type="text" name="projectcardurl" class="form-control" id="projectCardUrl" placeholder="https://github.com/hackforla/website/blob/gh-pages/_projects/<PROJECT-NAME.md>" required>
+        <small id="projectcardhelp" class="form-text text-muted">Your Project can be found in this <a href="https://github.com/hackforla/website/tree/gh-pages/_projects">folder</a></small>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary" disabled>Submit</button>
+  </form> -->
+
+<!-- <script>
+    document.addEventListener('submit',function(event){
+        event.preventDefault();
+        let {access_token} = JSON.parse(localStorage.getItem('github-cred'))
+        let data = Object.fromEntries( new FormData(event.target) );
+        event.target.reset();
+        let rv  = createIssue(data,access_token);
+        rv.then(e=>{
+
+            console.log(e);
+            alert('ISSUE HAS BEEN SUCCESULLY POSTED ON!')
+        })
+
+    })
+
+
+    async function createIssue(data,at){
+        let res = await axios.post(CREATE_ISSUE, data, { headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': `token ${at}`,
+            'Content-Type': "application/json"
+        }  } )
+        return res.data;
+    }
+</script> --></div>
