@@ -15,89 +15,93 @@
 
 <script type="text/javascript">
     let schema = {
-            "identification": { "type": "string" },
-            "title": { "type": "string" },
-            "description": { "type": "string" },
-            "image": { "type": "string" },
-            "image-hero": { "type": "string" },
-            "alt": { "type": "string" },
-            "leadership": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "required": ["name", "role", "picture", "links"],
-                    "properties": {
-                        "name": { "type": "string" },
-                        "role": { "type": "string" },
-                        "picture": { "type": "string" },
-                        "links": {
-                            "type": "object",
-                            "required": ["github", "slack"],
-                            "properties": {
-                                "github": { "type": "string" },
-                                "slack": { "type": "string" }
-                            },
-                            "additionalProperties": false
-                        }
-                    },
-                    "additionalProperties": false
-                }
-            },
-            "links": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "required": ["name", "url"],
-                    "properties": {
-                        "name": { "type": "string" },
-                        "url": { "type": "string" }
+        "identification": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "image-hero": { "type": "string" },
+        "alt": { "type": "string" },
+        "leadership": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["name", "role", "picture", "links"],
+                "properties": {
+                    "name": { "type": "string" },
+                    "role": { "type": "string" },
+                    "picture": { "type": "string" },
+                    "links": {
+                        "type": "object",
+                        "required": ["github", "slack"],
+                        "properties": {
+                            "github": { "type": "string" },
+                            "slack": { "type": "string" }
+                        },
+                        "additionalProperties": false
                     }
-                }
-            },
-            "location": {
-                "type": "array",
-                "items": {
-                    "type": "string",
-                    "enum": ["Remote", "Downtown LA", "Santa Monica", "South LA", "Los Angeles"]
-                }
-            },
-            "looking": {
-                "type": ["array", "null"],
-                "items": {
-                    "type": "object",
-                    "required": ["category", "skill"],
-                    "properties": {
-                        "category": { "type": "string" },
-                        "skill": { "type": "string" }
-                    },
-                    "additionalProperties": false
-                }
-            },
-            "technologies": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "partner": { "type": "string" },
-            "tools": { "type": "string" },
-            "vertical": { "type": "string" },
-            "status": {
-                "type": "string",
-                "enum": ["Active"]
+                },
+                "additionalProperties": false
             }
+        },
+        "links": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["name", "url"],
+                "properties": {
+                    "name": { "type": "string" },
+                    "url": { "type": "string" }
+                }
+            }
+        },
+        "location": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["Remote", "Downtown LA", "Santa Monica", "South LA", "Los Angeles"]
+            }
+        },
+        "looking": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "object",
+                "required": ["category", "skill"],
+                "properties": {
+                    "category": { "type": "string" },
+                    "skill": { "type": "string" }
+                },
+                "additionalProperties": false
+            }
+        },
+        "technologies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "partner": { "type": "string" },
+        "tools": { "type": "string" },
+        "vertical": { "type": "string" },
+        "status": {
+            "type": "string",
+            "enum": ["Active"]
+        }
     }
+
 
     $('form').jsonForm({
         schema,
-        onSubmit: function (errors, values) {
-            if (errors) {
-                $('#res').html('<p>I beg your pardon?</p>');
+        "form": [
+            {
+                "type": "button",
+                "title": "Submit Changes",
+                "onClick": function (evt) {
+                    evt.preventDefault();
+                                    }
             }
-            else {
-             console.log(valies)
-            }
-        }
+        ],
+        "onSubmitValid": function (values) {
+console.log(values)  }
     });
 </script>
 <!-- <form>
