@@ -1,4 +1,5 @@
 ---
+layout: default
 ---
 
 <div class="row align-items-center" style="height:50rem">
@@ -15,7 +16,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded',(event)=>{
-        //let gc = localStorage.getItem('github-cred');
         if(localStorage.getItem('github-cred')){
             window.location.replace(ISSUE_SUBMISSION_LOCAL);
         }

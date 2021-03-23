@@ -1,34 +1,51 @@
 ---
+layout: default
 ---
 
-<h1>Issue: Project Profile Card Review and Update</h1>
-<div class="row">
-    <div class="col-4">
-        <label for="projects">Choose a Project To Update:</label>
-        <select name="projects" id="projects"></select>
+<div>
+    <style type="text/css">
+        label {
+            text-transform: capitalize;
+            font-weight: bold;
+        }
+    </style>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <h1 class="my-2 py-2 justify-content-center">Issue: Project Profile Card Review and Update</h1>
+        </div>
+        <div class="col-3"></div>
+
     </div>
-    <div class="col-6">
-        <style type="text/css">
-            label {
-                text-transform: capitalize;
-                font-weight: bold;
-            }
-        </style>
-        <div class="form-container">
+
+    <div class="row">
+        <div class="col-6">
+            <div id="file-picker-container">
+                <label for="projects">Choose a Project To Update:</label>
+                <select name="projects" id="projects"></select>
+            </div>
+        </div>
+        <div class="col-6">
 
         </div>
-        <div id="res" class="alert"></div>
     </div>
-    <div class="col-2"></div>
+    <div class="row">
+        <div class="col-6">
+
+            <div class="form-container">
+
+            </div>
+            <div id="res" class="alert"></div>
+        </div>
+        <div class="col-6"></div>
+    </div>
+
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.0.0/js-yaml.min.js"
-    integrity="sha512-dYHhQSvQ3Lepc2xDidh80aADfrIAaVTs52W5JSFlE47SJgcwD+YY+iY0XmXD9UX3k0YOPvoyugS/ieGjpu5M/Q=="
-    crossorigin="anonymous"></script>
+
+
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", (event) => {
-
-
 
         let listOfProjects = getListOfProjects();
         listOfProjects.then((arr_object) => {
@@ -44,8 +61,7 @@
             .addEventListener("change", function (event) {
                 let projectDataFromFile = getProjectDataFromFile(event.target.value);
                 projectDataFromFile.then((rawDataYmlString) => {
-                    var value = jsyaml.load(rawDataYmlString);
-                    createFormPreFilled(value);
+                    createFormPreFilled(jsyaml.load(rawDataYmlString));
 
                 });
             });
@@ -143,15 +159,32 @@
                 if (errors) {
                     $("#res").html("<p>I beg your pardon?</p>");
                 } else {
-                    let submit = setNewIssue( jsyaml.dump(values) )
-                    submit.then(data=>{
-                        console.log(data);
-                    })
+                    onSubmitDo(values);
+
                 }
             },
         });
 
         applyStylesToForm();
+
+    }
+
+    function onSubmitDo(values) {
+        document.querySelector("[type=submit]").disabled = true;
+        let issueBody = `${codeblock('yaml', jsyaml.dump(values))}\n\n`;
+        let submit = createIssue(issueBody);
+        submit.then(data => {
+            afterSubmitPostProcessing(data);
+            document.querySelector("[type=submit]").insertAdjacentHTML('afterend', 
+                `<sub>Your issue has been successfully submitted <a target="_blank" href=${data.url}>here</a></sub>`); })
+
+    }
+
+    function afterSubmitPostProcessing(issue){
+        let previewChangesUrl = `http://localhost:4000/previewChanges?issue_number=${issue.number}`;
+        let pullRequestURL = `http://localhost:4000/pullRequest?issue_number=${issue.number}`;
+        let updatedIssueBody = `${issue.body}## [Preview Changes](${previewChangesUrl})\n## [Make Pull Request](${pullRequestURL})`;
+        updateIssue(issue.id, updatedIssueBody);
 
     }
 
@@ -163,10 +196,15 @@
                 .setAttribute("class", "px-5 py-5 border border-dark rounded");
 
     }
+
     function listCreator(path, name) {
         return `
             <option value=${path}>${name}</option>
 		   `;
+    }
+
+    function codeblock(language, code) {
+        return `<details><summary>For Developer Reference</summary>\n\n\`\`\`${language}\n${code}\n\`\`\` \n\n </details>\n`;
     }
 
     async function getProjectDataFromFile(path) {
@@ -185,18 +223,7 @@
                         }
                 }
                 `;
-
-        let res = await axios({
-            url: GRAPH_QL_BASE_ENDPOINT,
-            headers: {
-                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
-                "Content-Type": `application/json`,
-            },
-            method: "post",
-            data: {
-                query: data,
-            },
-        });
+        let res = await axiosQL(data);
         return res.data.data.repository.content.text.replaceAll("---", "");
     }
 
@@ -218,30 +245,21 @@
                     }
                 }}
                 `;
-
-        let res = await axios({
-            url: GRAPH_QL_BASE_ENDPOINT,
-            headers: {
-                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
-                "Content-Type": `application/json`,
-            },
-            method: "post",
-            data: {
-                query: data,
-            },
-        });
+        let res = await axiosQL(data);
         return res.data.data.repository.filename.entries;
     }
 
-    async function setNewIssue(issueBody) {
-
+    async function createIssue(issueBody) {
         data = `
                 mutation MyMutation {
                     __typename
-                    createIssue(input: {repositoryId: "MDEwOlJlcG9zaXRvcnkxMzAwMDA1NTE=", title: "Project Profile Card Review and Update", body: "${issueBody}" }) {
+                    createIssue(input: {repositoryId: "MDEwOlJlcG9zaXRvcnkzNDg3ODYyMTQ=", title: "Project Profile Card Review and Update", body: "${issueBody}" }) {
                         clientMutationId
                         issue {
                         url
+                        id
+                        body
+                        number
                         author {
                             ... on User {
                             id
@@ -251,6 +269,30 @@
                         }
                     }
                     }`;
+        let res = await axiosQL(data);
+        return res.data.data.createIssue.issue;
+    }
+
+    async function updateIssue(id, body) {
+        let data = `
+                    mutation MyMutation {
+                        __typename
+                        updateIssue(input: {id: "${id}", body: "${body}"}) {
+                            clientMutationId
+                            issue {
+                                body
+                                bodyHTML
+                            }
+                        }
+                    }
+
+        `;
+        let res = await axiosQL(data);
+        return res;
+
+    }
+
+    async function axiosQL(data) {
         let res = await axios({
             url: GRAPH_QL_BASE_ENDPOINT,
             headers: {
@@ -262,8 +304,8 @@
                 query: data,
             },
         });
-        return res.data.data.createIssue.issue;
-
+        return res;
 
     }
+
 </script>

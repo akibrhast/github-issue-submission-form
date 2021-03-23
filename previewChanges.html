@@ -1,0 +1,89 @@
+---
+layout: default
+---
+
+<div>
+  <style type="text/css">
+    label {
+      text-transform: capitalize;
+      font-weight: bold;
+    }
+  </style>
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <h1 class="my-2 py-2 justify-content-center">
+        Issue: Project Profile Card Review and Update
+      </h1>
+    </div>
+    <div class="col-3"></div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+        <div id="version-picker-container">
+            <label for="projects">Choose a Project Version To Display:</label>
+            <select name="projects-version" id="projects-version"></select>
+        </div>
+    </div>
+    <div class="col-6">
+
+    </div>
+</div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", (event) => {
+    const urlParams = Object.fromEntries(
+      new URLSearchParams(window.location.search)
+    );
+    let rv = getIssueDiffByyIssueNumber(urlParams.issue_number);
+    rv.then(rv=>{
+        console.log(rv);
+    })
+  });
+
+  async function getIssueDiffByyIssueNumber(issueNumber){
+        let data = 
+                `
+                {
+                repository(name: "github-issue-submission-form", owner: "akibrhast") {
+                    issue(number: ${issueNumber}) {
+                    userContentEdits(last: 10) {
+                        edges {
+                        node {
+                            id
+                            diff
+                            editor {
+                            ... on User {
+                                name
+                            }
+                            }
+                        }
+                        }
+                    }
+                    }
+                }
+                }
+                `;
+        let res = await axiosQL(data);
+        return res.data.data.repository.issue.userContentEdits.edges;
+
+  }
+
+
+  async function axiosQL(data) {
+        let res = await axios({
+            url: GRAPH_QL_BASE_ENDPOINT,
+            headers: {
+                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
+                "Content-Type": `application/json`,
+            },
+            method: "post",
+            data: {
+                query: data,
+            },
+        });
+        return res;
+
+    }
+
+</script>
