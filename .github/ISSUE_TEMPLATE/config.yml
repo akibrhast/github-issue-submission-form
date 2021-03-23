@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: lA lA la
-    url: https://github.com/akibrhast/github-issue-submission-form
-    about: Please ask and answer questions here.
+  - name: Project Profile Card Review and Update
+    url: http://localhost:4000/
+    about: Use this to update your existing project card with us or update an existing project card
