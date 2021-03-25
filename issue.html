@@ -75,21 +75,21 @@ layout: default
             identification: { type: "string", required: "true" },
             title: { type: "string", required: "true" },
             description: { type: "string", required: "true" },
-            image: { type: "string" },
-            "image-hero": { type: "string" },
-            alt: { type: "string" },
+            image: { type: "string" }, //required 600px by 400px
+            "image-hero": { type: "string" }, //required
+            alt: { type: "string" }, //required
             leadership: {
                 type: "array",
                 items: {
                     type: "object",
                     required: ["name", "role", "picture", "links"],
                     properties: {
-                        name: { type: "string" },
-                        role: { type: "string" },
-                        picture: { type: "string" },
+                        name: { type: "string" }, //required
+                        role: { type: "string" }, //required
+                        picture: { type: "string" }, //dont need to ask for this
                         links: {
                             type: "object",
-                            required: ["github", "slack"],
+                            required: ["github", "slack"], //ask github handle only without the hhtpss part and also for slack memberid[U015R4RTDJA]
                             properties: {
                                 github: { type: "string" },
                                 slack: { type: "string" },
@@ -181,9 +181,8 @@ layout: default
     }
 
     function afterSubmitPostProcessing(issue){
-        let previewChangesUrl = `http://localhost:4000/previewChanges?issue_number=${issue.number}`;
-        let pullRequestURL = `http://localhost:4000/pullRequest?issue_number=${issue.number}`;
-        let updatedIssueBody = `${issue.body}## [Preview Changes](${previewChangesUrl})\n## [Make Pull Request](${pullRequestURL})`;
+        let previewChangesUrl = `http://localhost:4000/previewChanges?issue_number=${issue.number}&issue_id=${issue.id}`;
+        let updatedIssueBody = `${issue.body}## [Preview Changes](${previewChangesUrl})\n`;
         updateIssue(issue.id, updatedIssueBody);
 
     }

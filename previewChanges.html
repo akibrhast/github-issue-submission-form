@@ -20,34 +20,223 @@ layout: default
   </div>
   <div class="row">
     <div class="col-6">
-        <div id="version-picker-container">
-            <label for="projects">Choose a Project Version To Display:</label>
-            <select name="projects-version" id="projects-version"></select>
-        </div>
+      <div id="version-picker-container">
+        <label for="projects">Choose a Project Version To Display:</label>
+        <select name="projects-version" id="projects-version"></select>
+      </div>
     </div>
     <div class="col-6">
 
     </div>
-</div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+
+      <div class="form-container">
+
+      </div>
+      <div id="res" class="alert"></div>
+    </div>
+    <div class="col-6"></div>
+  </div>
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", (event) => {
     const urlParams = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
-    let rv = getIssueDiffByyIssueNumber(urlParams.issue_number);
-    rv.then(rv=>{
-        console.log(rv);
-    })
+    localStorage.setItem('urlParams', JSON.stringify(urlParams));
+    let rv = getIssueDiffByIssueNumber(urlParams.issue_number);
+
+    rv.then(issueBody => {
+      issueBody.length >1 && issueBody.pop() ;
+      let originalBody = issueBody[issueBody.length-1].node.diff;
+      localStorage.setItem('original_body', JSON.stringify(originalBody));
+      let diffContainer = [];
+      for (const version of issueBody) {
+        let diffObject = createDiffObject(version);
+        diffContainer.push(diffObject);
+      }
+      localStorage.setItem('diff', JSON.stringify(diffContainer));
+      createDiffSelector(diffContainer);
+      createFormPreFilled(diffContainer[0].diffJson);
+    });
+
+    document
+      .querySelector("select")
+      .addEventListener("change", function (event) {
+        let diffContainer = JSON.parse(localStorage.getItem('diff'));
+        let diffIDSelected = event.target.value;
+        let selected = diffContainer.find(({ diffId }) => diffId === diffIDSelected);
+        createFormPreFilled(selected.diffJson)
+      });
+
   });
 
-  async function getIssueDiffByyIssueNumber(issueNumber){
-        let data = 
-                `
+
+  function createFormPreFilled(value) {
+
+    document.querySelector(`.form-container`).innerHTML = `<form></form>`;
+
+    const schema = {
+      identification: { type: "string", required: "true" },
+      title: { type: "string", required: "true" },
+      description: { type: "string", required: "true" },
+      image: { type: "string" }, //required 600px by 400px
+      "image-hero": { type: "string" }, //required
+      alt: { type: "string" }, //required
+      leadership: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["name", "role", "picture", "links"],
+          properties: {
+            name: { type: "string" }, //required
+            role: { type: "string" }, //required
+            picture: { type: "string" }, //dont need to ask for this
+            links: {
+              type: "object",
+              required: ["github", "slack"], //ask github handle only without the hhtpss part and also for slack memberid[U015R4RTDJA]
+              properties: {
+                github: { type: "string" },
+                slack: { type: "string" },
+              },
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+      links: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["name", "url"],
+          properties: {
+            name: { type: "string" },
+            url: { type: "string" },
+          },
+        },
+      },
+      location: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: [
+            "Remote",
+            "Downtown LA",
+            "Santa Monica",
+            "South LA",
+            "Los Angeles",
+          ],
+        },
+      },
+      looking: {
+        type: ["array", "null"],
+        items: {
+          type: "object",
+          required: ["category", "skill"],
+          properties: {
+            category: { type: "string" },
+            skill: { type: "string" },
+          },
+          additionalProperties: false,
+        },
+      },
+      technologies: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      partner: { type: "string" },
+      tools: { type: "string" },
+      vertical: { type: "string" },
+      status: {
+        type: "string",
+        enum: ["Active"],
+        required: "true",
+      },
+    };
+
+    $("form").jsonForm({
+      schema,
+      value,
+      onSubmit: function (errors, values) {
+        if (errors) {
+          $("#res").html("<p>I beg your pardon?</p>");
+        } else {
+          //onSubmitDo(values);
+          console.log(values)
+          document.querySelector("[type=submit]").disabled = true;
+          let updatedCode = `${codeblock('yaml', jsyaml.dump(values))}\n\n`;
+          let orginalBody = JSON.parse(localStorage.getItem('original_body'));
+          updatedBody = orginalBody.replace(/(?<=```yaml)[\s\S]*?(?=\s+```)/,updatedCode)
+
+          updateIssue(( JSON.parse(localStorage.getItem('urlParams')) ).issue_id,updatedBody);
+          alert("Edit Successfull!")
+          refresh();
+        }
+      },
+    });
+
+    applyStylesToForm();
+
+  }
+  function refresh() {    
+    setTimeout(function () {
+      window.location.href = window.location.href;
+        //location.reload()
+    }, 100);
+}
+
+  function codeblock(language, code) {
+        return `\n\n${code}\n`;
+    }
+  function applyStylesToForm() {
+
+    document.querySelector("form") &&
+      document
+        .querySelector("form")
+        .setAttribute("class", "px-5 py-5 border border-dark rounded");
+
+  }
+
+
+
+  function createDiffObject(version) {
+    let codeBlockRegexCapture = /(?<=```yaml)[\s\S]*?(?=\s+```)/;
+    let diffYaml = (version.node.diff.match(codeBlockRegexCapture))[0];
+
+    return {
+      diffId: version.node.id,
+      diffJson: jsyaml.load(diffYaml),
+      diffAuthor: version.node.editor.name,
+      diffCreatedAt: version.node.createdAt
+    };
+
+  }
+
+  function createDiffSelector(diffContainer) {
+    for (const diff of diffContainer) {
+      document.querySelector('#projects-version').insertAdjacentHTML("beforeend", listCreator(diff));
+    }
+
+  }
+
+  function listCreator(diff) {
+    return `
+            <option value=${diff.diffId}>Edited by ${diff.diffAuthor} at ${diff.diffCreatedAt}</option>
+		   `;
+  }
+
+  async function getIssueDiffByIssueNumber(issueNumber) {
+    let data =
+      `
                 {
                 repository(name: "github-issue-submission-form", owner: "akibrhast") {
                     issue(number: ${issueNumber}) {
-                    userContentEdits(last: 10) {
+                    userContentEdits(first: 5) {
                         edges {
                         node {
                             id
@@ -57,6 +246,7 @@ layout: default
                                 name
                             }
                             }
+                          createdAt
                         }
                         }
                     }
@@ -64,26 +254,45 @@ layout: default
                 }
                 }
                 `;
-        let res = await axiosQL(data);
-        return res.data.data.repository.issue.userContentEdits.edges;
+    let res = await axiosQL(data);
+    return res.data.data.repository.issue.userContentEdits.edges;
 
   }
 
+  async function updateIssue(id, body) {
+        let data = `
+                    mutation MyMutation {
+                        __typename
+                        updateIssue(input: {id: "${id}", body: "${body}"}) {
+                            clientMutationId
+                            issue {
+                                body
+                                bodyHTML
+                            }
+                        }
+                    }
 
-  async function axiosQL(data) {
-        let res = await axios({
-            url: GRAPH_QL_BASE_ENDPOINT,
-            headers: {
-                Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
-                "Content-Type": `application/json`,
-            },
-            method: "post",
-            data: {
-                query: data,
-            },
-        });
+        `;
+        let res = await axiosQL(data);
         return res;
 
     }
+
+
+  async function axiosQL(data) {
+    let res = await axios({
+      url: GRAPH_QL_BASE_ENDPOINT,
+      headers: {
+        Authorization: `token ${JSON.parse(localStorage.getItem("github-cred")).access_token}`,
+        "Content-Type": `application/json`,
+      },
+      method: "post",
+      data: {
+        query: data,
+      },
+    });
+    return res;
+
+  }
 
 </script>
